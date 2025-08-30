@@ -2,7 +2,7 @@
 
 namespace NinjaPortal\FilamentTranslations\Tables\Actions;
 
-use Filament\Tables\Actions\SelectAction;
+use Filament\Actions\SelectAction;
 use NinjaPortal\FilamentTranslations\Actions\Concerns\HasTranslatableLocaleOptions;
 
 class LocaleSwitcher extends SelectAction

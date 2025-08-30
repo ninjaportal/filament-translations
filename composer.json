@@ -18,12 +18,10 @@
     ],
     "require": {
         "php": "^8.2",
-        "spatie/laravel-package-tools": "^1.16.3",
+        "filament/filament": "^4.0",
         "illuminate/contracts": "^12.0",
-        "nesbot/carbon": "^3.0"
-    },
-    "require-dev": {
-
+        "nesbot/carbon": "^3.0",
+        "spatie/laravel-package-tools": "^1.16.3"
     },
     "autoload": {
         "psr-4": {
@@ -36,8 +34,6 @@
         }
     },
     "scripts": {
-        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
-        "test": "vendor/bin/pest",
         "format": "vendor/bin/pint"
     },
     "config": {
@@ -55,5 +51,8 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "require-dev": {
+        "filament/upgrade": "^4.0"
+    }
 }
