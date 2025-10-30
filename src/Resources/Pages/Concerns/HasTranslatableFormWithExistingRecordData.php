@@ -4,7 +4,7 @@ namespace NinjaPortal\FilamentTranslations\Resources\Pages\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Attributes\Locked;
-use NinjaPortal\Translatable\HasTranslations;
+use NinjaPortal\Portal\Translatable\HasTranslations;
 
 trait HasTranslatableFormWithExistingRecordData
 {
@@ -20,7 +20,7 @@ trait HasTranslatableFormWithExistingRecordData
 
         foreach ($this->getTranslatableLocales() as $locale) {
 
-            $translatedData = $record->getTranslation($locale)?->toArray() ?? [];
+            $translatedData = $record->getTranslation($locale, false)?->toArray() ?? [];
 
 
             if ($locale !== $this->activeLocale) {

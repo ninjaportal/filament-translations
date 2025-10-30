@@ -50,12 +50,11 @@ trait Translatable
         $translatableAttributes = static::getResource()::getTranslatableAttributes();
 
         $this->otherLocaleData[$this->oldActiveLocale] = Arr::only($this->data, $translatableAttributes);
+        $nextLocaleData = $this->otherLocaleData[$this->activeLocale] ?? [];
 
         $this->data = [
             ...Arr::except($this->data, $translatableAttributes),
-            ...$this->otherLocaleData[$this->activeLocale] ?? [],
+            ...$nextLocaleData,
         ];
-
-        unset($this->otherLocaleData[$this->activeLocale]);
     }
 }
