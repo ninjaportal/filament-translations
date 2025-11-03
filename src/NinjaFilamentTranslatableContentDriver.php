@@ -6,6 +6,7 @@ use Filament\Support\Contracts\TranslatableContentDriver;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 use function Filament\Support\generate_search_column_expression;
 
@@ -67,18 +68,18 @@ class NinjaFilamentTranslatableContentDriver implements TranslatableContentDrive
      */
     public function getRecordAttributesToArray(Model $record): array
     {
-        if (method_exists($record, 'setLocale')) {
-            $record->setLocale($this->activeLocale);
-        }
-
         $attributes = $record->attributesToArray();
 
         if (! method_exists($record, 'getTranslatableAttributes')) {
             return $attributes;
         }
 
+        if (! method_exists($record, 'getTranslation')) {
+            return $attributes;
+        }
+
         foreach ($record->getTranslatableAttributes() as $attribute) {
-            $attributes[$attribute] = $record->getAttribute($attribute);
+            $attributes[$attribute] = $record->getTranslation($attribute, $this->activeLocale);
         }
 
         return $attributes;

@@ -44,12 +44,13 @@ trait Translatable
         $translatableAttributes = static::getResource()::getTranslatableAttributes();
 
         $this->otherLocaleData[$this->oldActiveLocale] = Arr::only($this->data, $translatableAttributes);
-        $nextLocaleData = $this->otherLocaleData[$this->activeLocale] ?? $this->resolveLocaleData($this->activeLocale, $translatableAttributes);
 
         $this->data = [
             ...Arr::except($this->data, $translatableAttributes),
-            ...$nextLocaleData,
+            ...$this->otherLocaleData[$this->activeLocale] ?? [],
         ];
+
+        unset($this->otherLocaleData[$this->activeLocale]);
     }
 
     public function setActiveLocale(string $locale): void
@@ -57,24 +58,5 @@ trait Translatable
         $this->updatingActiveLocale();
         $this->activeLocale = $locale;
         $this->updatedActiveLocale();
-    }
-
-    protected function resolveLocaleData(string $locale, array $translatableAttributes): array
-    {
-        if (isset($this->otherLocaleData[$locale])) {
-            return $this->otherLocaleData[$locale];
-        }
-
-        $record = $this->getRecord();
-        $translation = $record->getTranslation($locale, false);
-
-        if ($translation === null) {
-            return $this->otherLocaleData[$locale] = [];
-        }
-
-        return $this->otherLocaleData[$locale] = Arr::only(
-            $translation->toArray(),
-            $translatableAttributes
-        );
     }
 }
