@@ -23,6 +23,11 @@ trait HasActiveLocaleSwitcher
         return $this->activeLocale;
     }
 
+    public function getActiveSchemaLocale(): ?string
+    {
+        return $this->getActiveFormsLocale();
+    }
+
     /**
      * @return class-string<TranslatableContentDriver> | null
      */
