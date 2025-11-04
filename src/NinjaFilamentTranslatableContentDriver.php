@@ -20,6 +20,7 @@ class NinjaFilamentTranslatableContentDriver implements TranslatableContentDrive
         if (! method_exists($model, 'isTranslatedAttribute')) {
             return false;
         }
+
         return $model->isTranslatedAttribute($attribute);
     }
 
@@ -28,13 +29,14 @@ class NinjaFilamentTranslatableContentDriver implements TranslatableContentDrive
      */
     public function makeRecord(string $model, array $data): Model
     {
-        $record = new $model();
+        $record = new $model;
 
         if (method_exists($record, 'setLocale')) {
             $record->setLocale($this->activeLocale);
         }
 
         $record->fill($data);
+
         return $record;
     }
 
@@ -52,13 +54,21 @@ class NinjaFilamentTranslatableContentDriver implements TranslatableContentDrive
      */
     public function updateRecord(Model $record, array $data): Model
     {
-        if (method_exists($record, 'setLocale')) {
-            $record->setLocale($this->activeLocale);
+        $translatableAttributes = method_exists($record, 'getTranslatableAttributes')
+            ? $record->getTranslatableAttributes()
+            : [];
+
+        $translationData = Arr::only($data, $translatableAttributes);
+        $attributeData = Arr::except($data, $translatableAttributes);
+
+        if (! empty($attributeData)) {
+            $record->fill($attributeData);
+            $record->save();
         }
 
-        $record->fill($data);
-
-        $record->save();
+        if (! empty($translationData)) {
+            $this->persistTranslation($record, $translationData, $this->activeLocale);
+        }
 
         return $record;
     }
@@ -78,8 +88,16 @@ class NinjaFilamentTranslatableContentDriver implements TranslatableContentDrive
             return $attributes;
         }
 
+        // Get the translation model for the active locale
+        $translation = $record->getTranslation($this->activeLocale);
+
+        if (! $translation) {
+            return $attributes;
+        }
+
+        // Extract translatable attributes from the translation model
         foreach ($record->getTranslatableAttributes() as $attribute) {
-            $attributes[$attribute] = $record->getTranslation($attribute, $this->activeLocale);
+            $attributes[$attribute] = $translation->getAttribute($attribute);
         }
 
         return $attributes;
@@ -100,5 +118,33 @@ class NinjaFilamentTranslatableContentDriver implements TranslatableContentDrive
             'like',
             (string) str($search)->wrap('%'),
         );
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    protected function persistTranslation(Model $record, array $attributes, ?string $locale = null): void
+    {
+        $targetLocale = $locale ?? $this->activeLocale;
+
+        if (! is_string($targetLocale) || $targetLocale === '') {
+            return;
+        }
+
+        if (method_exists($record, 'translations')) {
+            $record->translations()->updateOrCreate(
+                ['locale' => $targetLocale],
+                $attributes,
+            );
+
+            return;
+        }
+
+        if (method_exists($record, 'setLocale')) {
+            $record->setLocale($targetLocale);
+        }
+
+        $record->fill($attributes);
+        $record->save();
     }
 }

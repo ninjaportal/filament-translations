@@ -8,10 +8,17 @@ trait HasTranslatableRecord
 {
     public function getRecord(): Model
     {
-        $oldAppLocale = app()->getLocale();
+        if (blank($this->activeLocale)) {
+            return parent::getRecord();
+        }
+
+        $previousLocale = app()->getLocale();
         app()->setLocale($this->activeLocale);
-        $record = parent::getRecord();
-        app()->setLocale($oldAppLocale);
-        return $record;
+
+        try {
+            return parent::getRecord();
+        } finally {
+            app()->setLocale($previousLocale);
+        }
     }
 }
