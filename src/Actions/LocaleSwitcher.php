@@ -18,7 +18,7 @@ class LocaleSwitcher extends SelectAction
     {
         parent::setUp();
 
-        $this->label(__('ninja-filament-translatable-plugin::actions.active_locale.label'));
+        $this->label(__('filament-translations::actions.active_locale.label'));
 
         $this->setTranslatableLocaleOptions();
     }

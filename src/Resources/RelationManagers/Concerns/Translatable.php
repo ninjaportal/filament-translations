@@ -2,6 +2,7 @@
 
 namespace NinjaPortal\FilamentTranslations\Resources\RelationManagers\Concerns;
 
+use NinjaPortal\FilamentTranslations\NinjaFilamentTranslatablePlugin;
 use NinjaPortal\FilamentTranslations\Resources\Concerns\HasActiveLocaleSwitcher;
 
 trait Translatable
@@ -12,7 +13,7 @@ trait Translatable
     {
         if (
             blank($this->activeLocale) ||
-            (! in_array($this->activeLocale, $this->getTranslatableLocales()))
+            (! in_array($this->activeLocale, $this->getTranslatableLocales(), true))
         ) {
             $this->setActiveLocale();
         }
@@ -20,12 +21,22 @@ trait Translatable
 
     public function getTranslatableLocales(): array
     {
-        return filament('ninja-filament-translatable')->getDefaultLocales();
+        $plugin = filament('ninja-filament-translatable');
+
+        if ($plugin instanceof NinjaFilamentTranslatablePlugin) {
+            return $plugin->getDefaultLocales();
+        }
+
+        $fallbackLocales = config('ninjaportal.translatable.locales', ['en', 'ar']);
+
+        return array_values($fallbackLocales);
     }
 
     public function getDefaultTranslatableLocale(): string
     {
-        return $this->getTranslatableLocales()[0];
+        $locales = array_values($this->getTranslatableLocales());
+
+        return $locales[0] ?? config('app.locale');
     }
 
     public function getActiveTableLocale(): ?string

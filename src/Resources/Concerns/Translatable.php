@@ -31,6 +31,14 @@ trait Translatable
 
     public static function getTranslatableLocales(): array
     {
-        return filament('ninja-filament-translatable')->getDefaultLocales();
+        /** @var \NinjaPortal\FilamentTranslations\NinjaFilamentTranslatablePlugin|null $plugin */
+        $plugin = filament('ninja-filament-translatable');
+
+        if ($plugin instanceof \NinjaPortal\FilamentTranslations\NinjaFilamentTranslatablePlugin) {
+            return $plugin->getDefaultLocales();
+        }
+
+        // Fallback to config if plugin is not available or method doesn't exist
+        return config('ninjaportal.translatable.locales', ['en', 'ar']);
     }
 }
