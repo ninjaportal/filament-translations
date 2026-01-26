@@ -53,6 +53,6 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require-dev": {
-        "filament/upgrade": "^4.0"
+        "filament/upgrade": "^5.1"
     }
 }
